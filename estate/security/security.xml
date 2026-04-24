@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===================== -->
+    <!-- MODULE CATEGORY -->
+    <!-- ===================== -->
+    <record id="module_category_real_estate_brokerage" model="ir.module.category">
+        <field name="name">Real Estate</field>
+        <field name="description">Real Estate Management</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- GROUP PRIVILEGE -->
+    <!-- ===================== -->
+    <record id="groups_privilege_real_estate" model="res.groups">
+        <field name="name">Real Estate</field>
+        <field name="category_id" ref="module_category_real_estate_brokerage"/>
+    </record>
+
+    <!-- ===================== -->
+    <!-- AGENT GROUP -->
+    <!-- ===================== -->
+    <record id="estate_group_user" model="res.groups">
+        <field name="name">Agent</field>
+        <field name="category_id" ref="module_category_real_estate_brokerage"/>
+        <field name="implied_ids" eval="[(4, ref('groups_privilege_real_estate'))]"/>
+    </record>
+
+    <!-- ===================== -->
+    <!-- MANAGER GROUP -->
+    <!-- ===================== -->
+    <record id="estate_group_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_real_estate_brokerage"/>
+        <field name="implied_ids" eval="[
+            (4, ref('groups_privilege_real_estate')),
+            (4, ref('estate_group_user'))
+        ]"/>
+    </record>
+
+</odoo>
