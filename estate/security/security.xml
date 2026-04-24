@@ -39,4 +39,19 @@
         ]"/>
     </record>
 
+    <record id="estate_property_rule_agent" model="ir.rule">
+        <field name="name">Agent: own or unassigned properties</field>
+        <field name="model_id" ref="model_estate_property"/>
+        <field name="groups" eval="[(4, ref('estate_group_user'))]"/>
+        <field name="domain_force">
+            ['|', ('seller_id', '=', False), ('seller_id', '=', user.id)]
+        </field>
+    </record>
+
+    <record id="estate_property_rule_manager" model="ir.rule">
+        <field name="name">Manager: see all properties</field>
+        <field name="model_id" ref="model_estate_property"/>
+        <field name="groups" eval="[(4, ref('estate_group_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
 </odoo>
