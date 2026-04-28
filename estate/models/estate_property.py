@@ -57,6 +57,11 @@ class EstateProperty(models.Model):
     seller_id = fields.Many2one("res.users", default=lambda self: self.env.user)
     tag_ids = fields.Many2many("estate.property.tag")
     offer_ids = fields.One2many("estate.property.offer", "property_id")
+    company_id = fields.Many2one(
+        "res.company",
+        required=True,
+        default=lambda self: self.env.company
+    )
 
 
     expected_price = fields.Integer(default=230)

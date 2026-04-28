@@ -16,18 +16,21 @@
     <menuitem id="estate_config_menu"
               name="Configuration"
               parent="estate_root_menu"
-              sequence="10"/>
+              sequence="10"
+              groups="estate.estate_group_manager"/>
 
     <menuitem id="estate_property_type_menu"
               name="Property Types"
               parent="estate_config_menu"
               action="estate_property_type_action"
-              sequence="1"/>
+              sequence="1"
+              groups="estate.estate_group_manager"/>
 
     <menuitem id="estate_property_tag_menu"
               name="Property Tags"
               parent="estate_config_menu"
               action="estate_property_tag_action"
-              sequence="2"/>
+              sequence="2"
+              groups="estate.estate_group_manager"/>
 
 </odoo>

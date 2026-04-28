@@ -9,7 +9,11 @@ class EstateProperty(models.Model):
             for record in self:
                 selling_price = record.selling_price or 0.0
 
-                self.env["account.move"].create({
+                # Check if the current user can update this property
+                record.check_access('write')
+                print(f"Access check passed for property {record.name}")
+
+                self.env["account.move"].sudo().create({
                     "partner_id": record.buyer_id.id,
                     "move_type": "out_invoice",
                     "invoice_line_ids": [

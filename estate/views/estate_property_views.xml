@@ -98,6 +98,7 @@
                 <field name="total_area"/>
                 <field name="selling_price"/>
                 <field name="buyer_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
                 <field name="state"/>
             </list>
         </field>
@@ -150,6 +151,7 @@
                         <group>
                             <field name="postcode"/>
                             <field name="date_availability"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
                         </group>
 
                         <group>
@@ -163,7 +165,7 @@
                                options="{'no_create': True, 'no_open': True}"/>
                         <field name="tag_ids"
                                widget="many2many_tags"
-                               options="{'color_field': 'color'}"/>
+                               options="{'no_create': True, 'no_open': True, 'color_field': 'color'}"/>
                     </group>
 
                     <notebook>
@@ -232,6 +234,7 @@
                 <field name="postcode"/>
                 <field name="property_type_id"/>
                 <field name="buyer_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
 
                 <field name="living_area"
                        filter_domain="[('living_area', '>=', self)]"/>
