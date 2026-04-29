@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="pharma_control_center_form_view" model="ir.ui.view">
+        <field name="name">pharma.control.center.form</field>
+        <field name="model">pharma.control.center</field>
+        <field name="arch" type="xml">
+            <form string="💊 Pharma Dashboard">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Optional: keep the button if desired -->
+                    </div>
+                    <div class="oe_title">
+                        <h1>🏥 Pharma Control Center</h1>
+                        <p>📊 Your pharmacy at a glance</p>
+                    </div>
+
+                    <!-- Medicine Statistics (keep as is) -->
+                    <group string="💊 Medicine Overview" col="4">
+                        <field name="total_medicines" widget="statinfo" string="Total Medicines"/>
+                        <field name="total_stock_quantity" widget="statinfo" string="Total Stock Units"/>
+                        <field name="stock_value" widget="monetary" string="Stock Value"/>
+                        <field name="out_of_stock_count" widget="statinfo" string="Out of Stock"/>
+                        <field name="low_stock_count" widget="statinfo" string="Low Stock (&lt;10)"/>
+                        <field name="expiring_soon_count" widget="statinfo" string="Expiring ≤30 Days"/>
+                        <field name="expired_count" widget="statinfo" string="Expired"/>
+                    </group>
+
+
+                    <div class="alert alert-info" role="alert" style="margin-top: 16px;">
+                        ⚠️ <strong>Reminder:</strong> Low stock and expired medicines need immediate attention.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Dashboard action and menus (same as before) -->
+    <record id="pharma_control_center_action" model="ir.actions.act_window">
+        <field name="name">💊 Pharma Dashboard</field>
+        <field name="res_model">pharma.control.center</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="pharma_control_center_form_view"/>
+        <field name="target">main</field>
+    </record>
+
+    <menuitem id="pharma_root_menu"
+              name="💊 Pharma Control Center"
+              sequence="10"/>
+
+
+    <menuitem id="pharma_dashboard_menu"
+              name="📊 Pharma Dashboard"
+              parent="pharma_root_menu"
+              action="pharma_control_center_action"
+              sequence="1"
+              groups="pharma_control_center.group_pharmacy_doctor,pharma_control_center.group_pharmacy_manager"/>
+</odoo>
