@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Category -->
+    <record id="module_pharmacy_control_center" model="ir.module.category">
+        <field name="name">Pharma Control Center</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- Patient group – only white OTC medicines -->
+    <record id="group_pharmacy_patient" model="res.groups">
+        <field name="name">Patient</field>
+        <field name="category_id" ref="module_pharmacy_control_center"/>
+    </record>
+
+    <!-- Doctor group – can see blue+white medicines and manage own patients -->
+    <record id="group_pharmacy_doctor" model="res.groups">
+        <field name="name">Doctor</field>
+        <field name="category_id" ref="module_pharmacy_control_center"/>
+    </record>
+
+    <!-- Manager group – full access (no implied groups) -->
+    <record id="group_pharmacy_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_pharmacy_control_center"/>
+        <!-- implied_ids removed – Manager does NOT automatically imply Doctor -->
+    </record>
+
+</odoo>
