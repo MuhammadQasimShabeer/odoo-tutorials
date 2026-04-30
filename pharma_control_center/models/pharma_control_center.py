@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from datetime import date, timedelta
 
 class PharmaControlCenter(models.Model):
@@ -32,20 +32,32 @@ class PharmaControlCenter(models.Model):
         string="Expired Medicines", compute="_compute_statistics", store=False
     )
 
-    # Patient statistics (optional – you can keep or remove)
+    # Patient statistics
     total_patients = fields.Integer(
         string="Total Patients", compute="_compute_statistics", store=False
     )
     my_patients = fields.Integer(
         string="My Patients", compute="_compute_statistics", store=False
     )
-
     patient_ids = fields.One2many(
         'pharmacy.patient',
         string="Patients",
         compute='_compute_patient_ids',
-        readonly=True  # because list is read‑only
+        readonly=True
     )
+
+    # Today's orders summary
+    today_order_total_qty = fields.Float(
+        string="Total Quantity Today",
+        compute="_compute_today_orders_summary",
+        store=False
+    )
+    today_order_total_amount = fields.Float(
+        string="Total Sales Today",
+        compute="_compute_today_orders_summary",
+        store=False
+    )
+
     @api.depends()
     def _compute_statistics(self):
         Medicine = self.env['pharmacy.medicine']
@@ -69,7 +81,7 @@ class PharmaControlCenter(models.Model):
                 1 for med in all_meds if med.expiry_date and med.expiry_date < today
             )
 
-            # Patient stats (optional)
+            # Patient stats
             if Patient:
                 record.total_patients = Patient.search_count([])
                 if self.env.user.has_group('pharma_control_center.group_pharmacy_doctor'):
@@ -82,15 +94,53 @@ class PharmaControlCenter(models.Model):
 
     @api.depends()
     def _compute_patient_ids(self):
-        """Compute the patient list based on user's role."""
         Patient = self.env['pharmacy.patient']
         for record in self:
             if self.env.user.has_group('pharma_control_center.group_pharmacy_doctor'):
-                # Doctor: see only patients assigned to them
                 record.patient_ids = Patient.search([('doctor_id', '=', self.env.user.id)])
             elif self.env.user.has_group('pharma_control_center.group_pharmacy_manager'):
-                # Manager: see all patients
                 record.patient_ids = Patient.search([])
             else:
-                # Others (Patients, etc.) see no patient list
                 record.patient_ids = False
+
+    @api.depends()
+    def _compute_today_orders_summary(self):
+        """Compute total quantity and amount for today's orders.
+        Non‑managers see only their own orders."""
+        today = fields.Date.today()
+        tomorrow = today + timedelta(days=1)
+        domain = [
+            ('order_id.date_order', '>=', today),
+            ('order_id.date_order', '<', tomorrow),
+            ('order_id.state', 'not in', ['cancel'])
+        ]
+        if not self.env.user.has_group('pharma_control_center.group_pharmacy_manager'):
+            domain.append(('create_uid', '=', self.env.user.id))
+        order_lines = self.env['sale.order.line'].search(domain)
+        self.today_order_total_qty = sum(order_lines.mapped('product_uom_qty'))
+        self.today_order_total_amount = sum(order_lines.mapped('price_subtotal'))
+
+    def action_view_today_orders(self):
+        """Open a list of today's order lines."""
+        today = fields.Date.today()
+        tomorrow = today + timedelta(days=1)
+        domain = [
+            ('order_id.date_order', '>=', today),
+            ('order_id.date_order', '<', tomorrow),
+            ('order_id.state', 'not in', ['cancel'])
+        ]
+        if not self.env.user.has_group('pharma_control_center.group_pharmacy_manager'):
+            domain.append(('create_uid', '=', self.env.user.id))
+
+        # Use the custom view
+        view = self.env.ref('pharma_control_center.view_sale_order_line_today_list', raise_if_not_found=False)
+        view_id = view.id if view else False
+        return {
+            'type': 'ir.actions.act_window',
+            'name': "Today's Orders",
+            'res_model': 'sale.order.line',
+            'view_mode': 'list,form',
+            'target': 'current',
+            'domain': domain,
+            'views': [(view_id, 'list')] if view_id else [(False, 'list')],
+        }
