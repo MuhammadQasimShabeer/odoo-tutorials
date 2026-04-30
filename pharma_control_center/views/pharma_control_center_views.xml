@@ -7,15 +7,13 @@
         <field name="arch" type="xml">
             <form string="💊 Pharma Dashboard">
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <!-- Optional: keep the button if desired -->
-                    </div>
+                    <div class="oe_button_box" name="button_box"/>
                     <div class="oe_title">
                         <h1>🏥 Pharma Control Center</h1>
                         <p>📊 Your pharmacy at a glance</p>
                     </div>
 
-                    <!-- Medicine Statistics (keep as is) -->
+                    <!-- Medicine Statistics -->
                     <group string="💊 Medicine Overview" col="4">
                         <field name="total_medicines" widget="statinfo" string="Total Medicines"/>
                         <field name="total_stock_quantity" widget="statinfo" string="Total Stock Units"/>
@@ -26,6 +24,27 @@
                         <field name="expired_count" widget="statinfo" string="Expired"/>
                     </group>
 
+                    <!-- Today's Orders Summary -->
+                    <group string="🧾 Today's Orders Overview" col="2">
+                        <field name="today_order_total_qty" widget="float" string="Total Order Quantity"/>
+                        <field name="today_order_total_amount" widget="monetary" string="Total Order Amount"/>
+                    </group>
+
+                    <!-- Button to open today's order lines (no group restriction) -->
+                    <group string="Actions" col="1">
+                        <button name="action_view_today_orders" type="object"
+                                string="View Today's Order Lines"
+                                class="btn-primary"
+                                icon="fa-list-alt"/>
+                    </group>
+
+                    <!-- Optional patient overview (commented) -->
+                    <!--
+                    <group string="👥 Patient Overview" col="2">
+                        <field name="total_patients" widget="statinfo" string="Total Patients"/>
+                        <field name="my_patients" widget="statinfo" string="My Patients"/>
+                    </group>
+                    -->
 
                     <div class="alert alert-info" role="alert" style="margin-top: 16px;">
                         ⚠️ <strong>Reminder:</strong> Low stock and expired medicines need immediate attention.
@@ -35,7 +54,7 @@
         </field>
     </record>
 
-    <!-- Dashboard action and menus (same as before) -->
+    <!-- Dashboard action -->
     <record id="pharma_control_center_action" model="ir.actions.act_window">
         <field name="name">💊 Pharma Dashboard</field>
         <field name="res_model">pharma.control.center</field>
@@ -44,15 +63,16 @@
         <field name="target">main</field>
     </record>
 
+    <!-- Main menu (no group restriction) -->
     <menuitem id="pharma_root_menu"
               name="💊 Pharma Control Center"
               sequence="10"/>
 
-
+    <!-- Dashboard sub‑menu – now visible to all users -->
     <menuitem id="pharma_dashboard_menu"
               name="📊 Pharma Dashboard"
               parent="pharma_root_menu"
               action="pharma_control_center_action"
-              sequence="1"
-              groups="pharma_control_center.group_pharmacy_doctor,pharma_control_center.group_pharmacy_manager"/>
+              sequence="1"/>
+
 </odoo>
