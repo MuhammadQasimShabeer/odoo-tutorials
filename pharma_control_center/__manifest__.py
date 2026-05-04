@@ -33,6 +33,8 @@ Central system for pharmacy operations:
         'views/pharmacy_patient_views.xml',        # now includes the menuitem
         'views/pharmacy_category_views.xml',
         'views/pharmacy_order_views.xml',
+        'views/pharmacy_cart_views.xml',
+        'views/sales_report_views.xml',
     ],
     'installable': True,
     'application': True,
