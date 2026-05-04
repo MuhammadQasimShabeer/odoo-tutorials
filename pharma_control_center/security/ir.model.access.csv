@@ -15,3 +15,12 @@ access_pharmacy_patient_admin,pharmacy.patient.admin,model_pharmacy_patient,base
 access_pharmacy_patient_patient,pharmacy.patient.patient,model_pharmacy_patient,pharma_control_center.group_pharmacy_patient,1,0,0,0
 access_pharmacy_patient_doctor,pharmacy.patient.doctor,model_pharmacy_patient,pharma_control_center.group_pharmacy_doctor,1,1,1,1
 access_pharmacy_patient_manager,pharmacy.patient.manager,model_pharmacy_patient,pharma_control_center.group_pharmacy_manager,1,1,1,1
+access_pharmacy_cart_patient,pharmacy.cart.patient,model_pharmacy_cart,pharma_control_center.group_pharmacy_patient,1,1,1,1
+access_pharmacy_cart_doctor,pharmacy.cart.doctor,model_pharmacy_cart,pharma_control_center.group_pharmacy_doctor,1,1,1,1
+access_pharmacy_cart_manager,pharmacy.cart.manager,model_pharmacy_cart,pharma_control_center.group_pharmacy_manager,1,1,1,1
+access_pharmacy_cart_line_patient,pharmacy.cart.line.patient,model_pharmacy_cart_line,pharma_control_center.group_pharmacy_patient,1,1,1,1
+access_pharmacy_cart_line_doctor,pharmacy.cart.line.doctor,model_pharmacy_cart_line,pharma_control_center.group_pharmacy_doctor,1,1,1,1
+access_pharmacy_cart_line_manager,pharmacy.cart.line.manager,model_pharmacy_cart_line,pharma_control_center.group_pharmacy_manager,1,1,1,1
+access_sale_order_patient,sale.order.patient,sale.model_sale_order,pharma_control_center.group_pharmacy_patient,1,1,1,1
+access_sale_order_doctor,sale.order.doctor,sale.model_sale_order,pharma_control_center.group_pharmacy_doctor,1,1,1,1
+access_sale_order_manager,sale.order.manager,sale.model_sale_order,pharma_control_center.group_pharmacy_manager,1,1,1,1

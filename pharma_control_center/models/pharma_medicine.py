@@ -1,11 +1,6 @@
-import json
 from odoo import models, fields, api, _
 from datetime import date, timedelta, datetime
 from odoo.exceptions import UserError
-
-class ResUsers(models.Model):
-    _inherit = 'res.users'
-    cart_data = fields.Text(string="Cart Data", default="{}", help="JSON cart for pharmacy module")
 
 class PharmacyMedicine(models.Model):
     _name = "pharmacy.medicine"
@@ -51,58 +46,32 @@ class PharmacyMedicine(models.Model):
     last_invoice_id = fields.Many2one('account.move', string="Last Invoice", readonly=True)
     today_orders_qty = fields.Float(string="Today Orders", compute="_compute_today_orders", store=False)
 
-    # Cart fields (computed from user cart data)
-    cart_quantity = fields.Integer(string="Cart Quantity", compute="_compute_cart_fields")
-    cart_subtotal = fields.Float(string="Cart Subtotal", compute="_compute_cart_fields")
-    cart_item_ids = fields.Many2many('pharmacy.medicine', compute="_compute_cart_item_ids")
-    cart_total = fields.Float(string="Cart Total", compute="_compute_cart_total")
-
     # ------------------------------------------------------------
-    # Cart helper methods
-    # ------------------------------------------------------------
-    def _get_cart_dict(self):
-        """Return dict {medicine_id: quantity} from user's cart_data"""
-        data = self.env.user.cart_data
-        if not data:
-            return {}
-        return json.loads(data)
-
-    def _set_cart_dict(self, cart_dict):
-        self.env.user.sudo().write({'cart_data': json.dumps(cart_dict)})
-
-    def _compute_cart_fields(self):
-        cart = self._get_cart_dict()
-        for med in self:
-            qty = cart.get(str(med.id), 0)
-            med.cart_quantity = qty
-            med.cart_subtotal = qty * med.price
-
-    def _compute_cart_item_ids(self):
-        cart = self._get_cart_dict()
-        self.cart_item_ids = self.browse([int(k) for k in cart.keys()])
-
-    def _compute_cart_total(self):
-        cart = self._get_cart_dict()
-        total = 0.0
-        for med_id, qty in cart.items():
-            med = self.browse(int(med_id))
-            total += med.price * qty
-        self.cart_total = total
-
-    # ------------------------------------------------------------
-    # Cart actions
+    # Cart actions (using dedicated cart model)
     # ------------------------------------------------------------
     def add_to_cart(self):
         self.ensure_one()
         if self.order_qty <= 0:
-            raise UserError(_("Quantity must be greater than zero"))
+            raise UserError(_("Order quantity must be greater than zero."))
         if self.order_qty > self.quantity:
             raise UserError(_("Not enough stock. Available: %s") % self.quantity)
 
-        cart = self._get_cart_dict()
-        key = str(self.id)
-        cart[key] = cart.get(key, 0) + self.order_qty
-        self._set_cart_dict(cart)
+        cart = self.env['pharmacy.cart'].search([('user_id', '=', self.env.user.id)], limit=1)
+        if not cart:
+            cart = self.env['pharmacy.cart'].create({'user_id': self.env.user.id})
+
+        cart_line = self.env['pharmacy.cart.line'].search([
+            ('cart_id', '=', cart.id),
+            ('medicine_id', '=', self.id)
+        ], limit=1)
+        if cart_line:
+            cart_line.quantity += self.order_qty
+        else:
+            self.env['pharmacy.cart.line'].create({
+                'cart_id': cart.id,
+                'medicine_id': self.id,
+                'quantity': self.order_qty,
+            })
         self.order_qty = 1
         return {
             'type': 'ir.actions.client',
@@ -113,50 +82,6 @@ class PharmacyMedicine(models.Model):
                 'type': 'success',
                 'sticky': False,
             }
-        }
-
-    def remove_from_cart(self):
-        self.ensure_one()
-        cart = self._get_cart_dict()
-        key = str(self.id)
-        if key in cart:
-            del cart[key]
-            self._set_cart_dict(cart)
-        return {'type': 'ir.actions.client', 'tag': 'reload'}
-
-    def checkout(self):
-        cart = self._get_cart_dict()
-        if not cart:
-            raise UserError(_("Your cart is empty."))
-        order_lines = []
-        for med_id, qty in cart.items():
-            med = self.browse(int(med_id))
-            if not med.product_id:
-                med._create_product()
-            order_lines.append((0, 0, {
-                'product_id': med.product_id.id,
-                'product_uom_qty': qty,
-                'price_unit': med.price,
-            }))
-        sale_order = self.env['sale.order'].create({
-            'partner_id': self.env.user.partner_id.id,
-            'order_line': order_lines,
-        })
-        sale_order.action_confirm()
-        invoice = sale_order._create_invoices()
-        invoice.action_post()
-
-        for med_id, qty in cart.items():
-            med = self.browse(int(med_id))
-            med.quantity -= qty
-
-        self._set_cart_dict({})
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'account.move',
-            'res_id': invoice.id,
-            'view_mode': 'form',
-            'target': 'new',
         }
 
     # ------------------------------------------------------------
