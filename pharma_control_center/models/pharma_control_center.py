@@ -2,32 +2,52 @@ from odoo import models, fields, api, _
 from datetime import date, timedelta
 from odoo.exceptions import UserError
 
+
 class PharmaControlCenter(models.Model):
     _name = "pharma.control.center"
     _description = "Pharma Control Center"
     _rec_name = "user_id"
 
-    # User profile
+    # --- User profile (stored, writable) ---
     user_id = fields.Many2one('res.users', string="User", required=True, default=lambda self: self.env.user)
     avatar = fields.Binary(string="Profile Picture", attachment=True)
     avatar_filename = fields.Char(string="Avatar Filename")
-    name = fields.Char(string="Display Name", related='user_id.name', readonly=True)
-    email = fields.Char(string="Email", related='user_id.partner_id.email', readonly=True)
-    phone = fields.Char(string="Phone", related='user_id.partner_id.phone', readonly=True)
-    role = fields.Char(string="Role", compute='_compute_role', store=False)
 
-    def _compute_role(self):
+    # Editable profile fields (stored locally)
+    display_name = fields.Char(string="Full Name", required=True)
+    email = fields.Char(string="Email", required=True)
+    phone = fields.Char(string="Phone")
+
+
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        for rec in records:
+            rec._sync_user_profile()
+        return records
+
+    def write(self, vals):
+        res = super().write(vals)
+        if any(field in vals for field in ['display_name', 'email', 'phone']):
+            self._sync_user_profile()
+        return res
+
+    def _sync_user_profile(self):
+        """Sync local fields to res.users and res.partner."""
         for rec in self:
-            if rec.user_id.has_group('pharma_control_center.group_pharmacy_manager'):
-                rec.role = "Manager"
-            elif rec.user_id.has_group('pharma_control_center.group_pharmacy_doctor'):
-                rec.role = "Doctor"
-            elif rec.user_id.has_group('pharma_control_center.group_pharmacy_patient'):
-                rec.role = "Patient"
-            else:
-                rec.role = "None"
+            user = rec.user_id
+            partner = user.partner_id
+            if partner.name != rec.display_name:
+                partner.write({'name': rec.display_name})
+                user.write({'name': rec.display_name})
+            if partner.email != rec.email:
+                partner.write({'email': rec.email})
+                user.write({'email': rec.email})
+            if partner.phone != rec.phone:
+                partner.write({'phone': rec.phone})
 
-    # Medicine statistics
+    # --- Medicine statistics (unchanged) ---
     total_medicines = fields.Integer(string="Total Medicines", compute="_compute_statistics", store=False)
     total_stock_quantity = fields.Integer(string="Total Stock Quantity", compute="_compute_statistics", store=False)
     stock_value = fields.Float(string="Stock Value", compute="_compute_statistics", store=False)
@@ -36,17 +56,19 @@ class PharmaControlCenter(models.Model):
     expiring_soon_count = fields.Integer(string="Expiring ≤30 Days", compute="_compute_statistics", store=False)
     expired_count = fields.Integer(string="Expired", compute="_compute_statistics", store=False)
 
-    # Patient statistics
+    # --- Patient statistics (unchanged) ---
     total_patients = fields.Integer(string="Total Patients", compute="_compute_statistics", store=False)
     my_patients = fields.Integer(string="My Patients", compute="_compute_statistics", store=False)
     patient_ids = fields.One2many('pharmacy.patient', string="Patients", compute='_compute_patient_ids', readonly=True)
 
-    # Today's orders summary
-    today_order_total_qty = fields.Float(string="Total Quantity Today", compute="_compute_today_orders_summary", store=False)
-    today_order_total_amount = fields.Float(string="Total Sales Today", compute="_compute_today_orders_summary", store=False)
+    # --- Today's orders summary (unchanged) ---
+    today_order_total_qty = fields.Float(string="Total Quantity Today", compute="_compute_today_orders_summary",
+                                         store=False)
+    today_order_total_amount = fields.Float(string="Total Sales Today", compute="_compute_today_orders_summary",
+                                            store=False)
 
     # -------------------------------------------------------------------------
-    # Compute methods
+    # Compute methods (unchanged)
     # -------------------------------------------------------------------------
     @api.depends()
     def _compute_statistics(self):
@@ -105,7 +127,7 @@ class PharmaControlCenter(models.Model):
         self.today_order_total_amount = sum(lines.mapped('price_subtotal'))
 
     # -------------------------------------------------------------------------
-    # Actions
+    # Actions (unchanged)
     # -------------------------------------------------------------------------
     def action_view_today_orders(self):
         today = fields.Date.today()
@@ -130,13 +152,11 @@ class PharmaControlCenter(models.Model):
             'views': [(view_id, 'list')] if view_id else [(False, 'list')],
         }
 
-    # -------------------------------------------------------------------------
-    # Helper to ensure one record per user (called at login)
-    # -------------------------------------------------------------------------
     @api.model
     def _ensure_one_per_user(self):
         user = self.env.user
         record = self.search([('user_id', '=', user.id)], limit=1)
         if not record:
-            record = self.create({'user_id': user.id})
+            record = self.create(
+                {'user_id': user.id, 'display_name': user.name, 'email': user.email, 'phone': user.phone})
         return record.id

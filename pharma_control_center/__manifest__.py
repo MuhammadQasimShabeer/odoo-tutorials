@@ -35,6 +35,7 @@ Central system for pharmacy operations:
         'views/pharmacy_order_views.xml',
         'views/pharmacy_cart_views.xml',
         'views/sales_report_views.xml',
+        'views/manager_analytics_views.xml',
     ],
     'installable': True,
     'application': True,
