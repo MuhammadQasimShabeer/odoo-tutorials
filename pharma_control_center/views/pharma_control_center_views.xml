@@ -8,23 +8,22 @@
             <form string="👤 User Dashboard">
                 <sheet>
                     <div class="oe_title">
-                        <h1>Welcome, <field name="name"/></h1>
-                        <p><field name="role" widget="badge"/> – Pharma Control Center</p>
+                        <h1>Welcome, <field name="display_name"/></h1>
+                        <p>Pharma Control Center</p>
                     </div>
 
                     <!-- Two columns: left profile card, right statistics -->
                     <group col="2">
-                        <!-- LEFT: Profile card -->
+                        <!-- LEFT: Profile card (editable) -->
                         <group string="Profile" name="profile">
                             <field name="avatar" widget="image" class="oe_avatar" style="width: 150px; height: 150px;"/>
                             <div style="margin-top: 8px;">
                                 <label for="avatar" string="Change Picture"/>
                                 <field name="avatar_filename" invisible="1"/>
                             </div>
-                            <field name="name" string="Full Name" readonly="1"/>
-                            <field name="email" string="Email" readonly="1"/>
-                            <field name="phone" string="Phone" readonly="1"/>
-                            <field name="role" string="Role" widget="badge"/>
+                            <field name="display_name" string="Full Name"/>
+                            <field name="email" string="Email"/>
+                            <field name="phone" string="Phone"/>
                         </group>
 
                         <!-- RIGHT: Medicine Overview -->
@@ -92,7 +91,7 @@
 
     <!-- Main menu -->
     <menuitem id="pharma_root_menu"
-              name="💊Your Pharma CC"
+              name="💊 Your Pharma CC"
               sequence="10"/>
 
     <!-- Dashboard sub‑menu -->
