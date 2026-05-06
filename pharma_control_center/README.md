@@ -9,6 +9,9 @@
 - 👥 **Patient-doctor relationship system** with secure record visibility
 - 🛒 **Cart-based ordering workflow** with one-click checkout and automatic invoicing
 - 📊 **Real-time dashboard** with user profile, statistics, and operational alerts
+- ⚠️ **Drug interaction detection** system with severity levels and warnings
+- 📈 **Advanced sales analytics** with graphs and pivot tables for managers
+- 💌 **Email notifications** via SMTP for order confirmations and alerts
 - 🔐 **Enterprise-grade security** with role-based access control and record-level rules
 - ✨ **Odoo 18 compliant** with modern views, computed fields, and QWeb templates
 
@@ -66,6 +69,23 @@
 - **Patients have zero access** – cannot view any patient records (CSV-level restriction)
 - **Active/inactive status** – soft-delete support for patient record archival
 
+### ⚠️ Intelligent Drug Interaction Detection System
+
+#### Comprehensive Interaction Management
+- **Medicine pair tracking** – define interactions between any two medicines
+- **Severity levels** – Minor, Moderate, and Severe classifications for clinical relevance
+- **Interactive warnings** – descriptive warning messages explaining side effects and risks
+- **Real-time validation** – automatic detection when conflicting medicines are added to cart
+- **Checkout blocking** – prevents orders with severe interactions unless explicitly overridden
+- **Clinical safety** – protects patients from potentially dangerous drug combinations
+
+#### Interaction Features
+- **Bidirectional detection** – interactions detected regardless of medicine order in cart
+- **Warning display** – clear visual alerts in cart interface with severity indicators
+- **Warning messages** – actionable information for doctors/pharmacists regarding interactions
+- **Database tracking** – all interactions stored and queryable for compliance and audit trails
+- **Complete interaction history** – maintains records of all detected interactions for reporting
+
 ### 🛒 Sophisticated Cart-Based Ordering System
 
 #### Modern Shopping Cart Interface
@@ -76,6 +96,7 @@
 - **Cart summary** – displays total quantity and total amount for all items
 - **Line-item removal** – delete specific medicines from cart without losing cart context
 - **Dynamic pricing** – unit prices and subtotals automatically sync with latest medicine prices
+- **Drug interaction warnings** – real-time detection and display of potential medicine interactions in cart
 
 #### Streamlined Order Placement & Checkout
 - **One-click checkout** – single button creates complete sale order with all cart items
@@ -85,6 +106,7 @@
 - **Inventory synchronization** – stock quantities automatically reduced for each medicine
 - **Cart cleanup** – cart lines deleted after successful checkout
 - **User context** – sale orders linked to current user as create_uid
+- **Interaction validation** – blocks checkout on severe medicine interactions
 
 #### Orders Management Interface
 - **Dedicated Orders menu** – centralized view of all sale orders created via cart
@@ -209,14 +231,63 @@ Manager Rule:  domain [(1, '=', 1)]  [universal domain]
 #### Model-Level Access Control (CSV-based)
 
 | Model | Patient | Doctor | Manager | Access Type |
-|-------|---------|--------|---------|-------------|
+| |-------|---------|--------|---------|-------------|
 | **pharmacy.medicine** | ✓ Read | ✓ Read | ✓✓ Full CRUD | Via record rules |
 | **pharma.control.center** | ✓ Read | ✓ Read | ✓✓ Full CRUD | Dashboard access |
 | **pharmacy.category** | ✗ None | ✓ Read | ✓✓ Full CRUD | Config only for managers |
 | **pharmacy.patient** | ✗ None | ✓ Full CRUD (own) | ✓✓ Full CRUD (all) | Via record rules |
+| **pharmacy.interaction** | ✗ None | ✓ Read | ✓✓ Full CRUD | Drug interaction management |
 | **pharmacy.cart** | ✓✓ Full CRUD | ✓✓ Full CRUD | ✓✓ Full CRUD | User's own cart |
 | **pharmacy.cart.line** | ✓✓ Full CRUD | ✓✓ Full CRUD | ✓✓ Full CRUD | Within user's cart |
 | **sale.order** | ✓ Own orders | ✓ Own orders | ✓✓ Full CRUD | Via record rules |
+
+---
+
+## 📈 Advanced Analytics & Reporting
+
+### Sales Analytics Dashboard (Manager-Only)
+The module provides comprehensive sales analytics exclusively for managers with real-time data visualization.
+
+#### Graph-Based Sales Trends
+- **Bar graph visualization** – daily sales trends with intuitive bar chart representation
+- **Customizable intervals** – view data by day, week, month for different analysis levels
+- **Sales metrics** – displays total sales amount (monetary value) with currency formatting
+- **Interactive filtering** – drill-down capabilities to analyze specific time periods and products
+
+#### Pivot Table Analysis
+- **Multi-dimensional pivot views** – analyze sales data from multiple perspectives
+- **Dimensional grouping** – break down by date (monthly), patient, and doctor
+- **Aggregated metrics** – sum of total sales amount displayed in pivot tables
+- **Export capabilities** – export pivot data for external reporting and analysis
+
+#### Sales Report Views
+- **Comprehensive reporting interface** – dedicated Sales Report menu in Analytics section
+- **Filter options** – filter by date range, patient, doctor, or order status
+- **Group by options** – organize data by day, week, month, patient, or doctor
+- **Status filtering** – exclude cancelled orders from reports automatically
+- **Order date filtering** – date range selection for specific period analysis
+
+#### Manager-Exclusive Access
+- **Role-based visibility** – analytics menus visible only to pharmacy managers
+- **Full data access** – view all sales data across all doctors and patients
+- **Comprehensive insights** – KPIs for performance tracking and inventory forecasting
+- **Decision support** – data-driven insights for business optimization
+
+### Email Notification System (SMTP Configuration)
+The module supports automated email notifications for critical pharmacy operations.
+
+#### Notification Features
+- **Order confirmations** – automatic emails sent to customers upon successful checkout
+- **Expiry alerts** – scheduled emails alerting managers about medicines expiring soon
+- **Inventory alerts** – notifications when medicines reach or fall below reorder levels
+- **Transaction reports** – summary emails of daily sales and transactions
+- **SMTP configuration** – seamless integration with Odoo's mail server settings
+
+#### Email Template System
+- **Customizable templates** – pre-defined templates for different notification types
+- **Dynamic content** – templates automatically populate with order and patient details
+- **Multi-recipient support** – emails sent to patients, doctors, and managers as appropriate
+- **Audit trail** – all sent emails logged in Odoo for compliance and tracking
 
 ---
 
@@ -239,6 +310,7 @@ odoo-tutorials/pharma_control_center/
 │   ├── pharmacy_cart.py                       # Shopping cart and checkout logic
 │   ├── pharmacy_category.py                   # Hierarchical medicine categories
 │   ├── pharmacy_patient.py                    # Patient records with doctor assignment
+│   ├── pharmacy_interaction.py                # Drug interaction model and detection
 │   └── __pycache__/                           # Compiled Python cache
 │
 ├── security/                                  # Access control configuration
@@ -254,7 +326,10 @@ odoo-tutorials/pharma_control_center/
 │   ├── pharmacy_patient_views.xml             # Patient list, form, search views
 │   ├── pharmacy_category_views.xml            # Category tree and form views
 │   ├── pharmacy_cart_views.xml                # Shopping cart interface
-│   └── pharmacy_order_views.xml               # Sale order views (Orders menu)
+│   ├── pharmacy_interaction_views.xml         # Drug interaction list and form views
+│   ├── pharmacy_order_views.xml               # Sale order views (Orders menu)
+│   ├── sales_report_views.xml                 # Sales report with pivot view
+│   └── manager_analytics_views.xml            # Manager analytics with graphs
 │
 └── test/                                      # Unit tests
     └── test_pharma_control_center.py          # Test cases for core functionality
@@ -387,7 +462,22 @@ Patient information with doctor assignment.
 | `allergies` | Text | Known allergies |
 | `active` | Boolean | Active/archived status |
 
----
+#### **pharmacy.interaction** – Drug Interaction Records (21 lines)
+Drug interaction tracking and management for clinical safety.
+
+| Field | Type | Description | Required | Computed |
+|-------|------|-------------|----------|----------|
+| `medicine1_id` | Many2one → pharmacy.medicine | First medicine | ✓ | - |
+| `medicine2_id` | Many2one → pharmacy.medicine | Second medicine | ✓ | - |
+| `severity` | Selection | Interaction severity level | ✓ | - (minor/moderate/severe) |
+| `warning_text` | Text | Clinical warning message | ✓ | - |
+| `display_name` | Char | Display name (computed) | - | ✓ Computed: "Medicine1 + Medicine2" |
+
+**Key Features:**
+- Bidirectional interaction detection
+- Severity-based checkout blocking
+- Clinical safety validation
+- Warning message tracking
 
 ## 🚀 Installation & Setup
 
@@ -458,6 +548,30 @@ Demo data loads automatically if `demo_medicines.xml` and `demo_patients.xml` ar
 3. **Configuration:** Create/edit medicine categories; configure reorder levels
 4. **Inventory Management:** Monitor stock, expiry dates, and low-stock alerts
 5. **Orders:** View and manage all sale orders; can edit order details post-creation
+6. **Drug Interactions:** Manage drug interaction database; define interactions between medicines
+7. **Sales Analytics:** Access comprehensive sales analytics with graphs and pivot tables
+8. **Reports:** Generate sales reports grouped by date, patient, or doctor
+
+### Drug Interaction Management
+1. **Access Interactions:** Navigate to **⚠️ Drug Interactions** menu
+2. **View Interactions:** List of all configured drug interactions with severity levels
+3. **Create Interaction:** Click **Create** button to define new interactions
+4. **Configure Details:**
+   - Select Medicine A and Medicine B
+   - Set severity level (Minor/Moderate/Severe)
+   - Enter warning message with clinical details
+5. **Cart Validation:** System automatically detects interactions when medicines added to cart
+6. **Checkout Blocking:** Severe interactions will block checkout until resolved
+
+### Analytics & Sales Reports
+1. **Access Analytics:** Click **📊 Analytics** menu (Manager-only)
+2. **View Sales Analytics:** Click **📈 Sales Analytics** to see graphs and pivot tables
+3. **Graph View:** Bar charts showing daily sales trends with total sales amount
+4. **Pivot View:** Multi-dimensional analysis by month, patient, and doctor
+5. **Sales Report:** Click **Sales Report** for detailed transaction reports
+6. **Filtering:** Use date range, patient, and doctor filters
+7. **Grouping:** Organize data by day, week, month, patient, or doctor
+8. **Export:** Export pivot data for external analysis (Excel, sheets, etc.)
 
 ### Cart Workflow Example
 ```
@@ -617,7 +731,19 @@ odoo -d your_database -i pharma_control_center --test-tags pharma_control_center
 
 ## 📋 Changelog
 
-### Version 1.0 (Current) – April 29, 2026
+### Version 1.1 (Current) – May 6, 2026
+- ✅ Advanced drug interaction detection system with severity levels
+- ✅ Real-time interaction warnings in shopping cart
+- ✅ Checkout blocking for severe medicine interactions
+- ✅ Comprehensive sales analytics dashboard (Manager-only)
+- ✅ Graph-based sales trends with bar charts and line graphs
+- ✅ Multi-dimensional pivot table analysis for sales data
+- ✅ Flexible sales report views with filtering and grouping options
+- ✅ Email notification system with SMTP configuration
+- ✅ Order confirmation emails and expiry alert notifications
+- ✅ Transaction summary reports via email
+
+### Version 1.0 – April 29, 2026
 - ✅ Complete medicine management module with batch and expiry tracking
 - ✅ Patient records with doctor assignments and role-based visibility
 - ✅ Cart-based ordering workflow with one-click checkout
@@ -668,8 +794,8 @@ This module is free software: you can redistribute it and/or modify it under the
 **Pharma Control Center** is developed with ❤️ for the Odoo community, providing a professional-grade solution for pharmacy and healthcare operations management.
 
 **Author:** Muhammad Qasim Shabbir (AI Trainer/Developer)  
-**Date:** May 1, 2026  
-**Version:** 1.0  
+**Date:** May 6, 2026  
+**Version:** 1.1  
 **Module Status:** Production-Ready  
 **Odoo Compatibility:** 18.0+
 
