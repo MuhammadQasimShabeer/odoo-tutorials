@@ -18,11 +18,34 @@ class PharmacyCart(models.Model):
     # Barcode input (temporary, not stored)
     barcode_input = fields.Char(string="Barcode", help="Scan or type medicine barcode to add to cart")
 
+    # Drug interaction warnings
+    interaction_warnings = fields.Text(string="Interactions", compute="_compute_interaction_warnings")
+
     @api.depends('cart_line_ids.subtotal')
     def _compute_totals(self):
         for cart in self:
             cart.total_quantity = sum(cart.cart_line_ids.mapped('quantity'))
             cart.total_amount = sum(cart.cart_line_ids.mapped('subtotal'))
+
+    @api.depends('cart_line_ids.medicine_id')
+    def _compute_interaction_warnings(self):
+        for cart in self:
+            warnings = cart._check_interactions()
+            cart.interaction_warnings = "\n".join(warnings) if warnings else False
+
+    def _check_interactions(self):
+        """Return a list of interaction warnings for current cart lines."""
+        medicines = self.cart_line_ids.mapped('medicine_id')
+        if len(medicines) < 2:
+            return []
+        warnings = []
+        interactions = self.env['pharmacy.interaction'].search([
+            ('medicine1_id', 'in', medicines.ids),
+            ('medicine2_id', 'in', medicines.ids)
+        ])
+        for inter in interactions:
+            warnings.append(f"{inter.medicine1_id.name} + {inter.medicine2_id.name}: {inter.warning_text} (Severity: {inter.severity})")
+        return warnings
 
     def action_add_quick_medicines(self):
         for cart in self:
@@ -67,13 +90,27 @@ class PharmacyCart(models.Model):
                 'medicine_id': medicine.id,
                 'quantity': 1,
             })
-        self.barcode_input = False  # clear after use
+        self.barcode_input = False
         return {'type': 'ir.actions.client', 'tag': 'reload'}
 
     def action_checkout(self):
         self.ensure_one()
         if not self.cart_line_ids:
             raise UserError(_("Your cart is empty."))
+        # Optionally check for severe interactions and block checkout
+        severe_warnings = [w for w in self._check_interactions() if 'Severe' in w]
+        if severe_warnings and not self.env.context.get('ignore_interactions'):
+            warnings_text = "\n".join(severe_warnings)
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Drug Interaction Warning'),
+                    'message': warnings_text + "\n\nPlease remove conflicting medicines or contact your doctor.",
+                    'type': 'warning',
+                    'sticky': True,
+                }
+            }
         order_lines = []
         for line in self.cart_line_ids:
             if not line.medicine_id.product_id:

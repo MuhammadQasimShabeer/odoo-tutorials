@@ -29,6 +29,7 @@ Central system for pharmacy operations:
         'data/demo_patients.xml',
         'data/demo_medicines.xml',
         'views/pharma_control_center_views.xml',   # root menu defined here
+        'views/pharmacy_interaction_views.xml',
         'views/pharmacy_medicine_views.xml',
         'views/pharmacy_patient_views.xml',        # now includes the menuitem
         'views/pharmacy_category_views.xml',

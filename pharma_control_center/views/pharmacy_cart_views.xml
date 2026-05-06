@@ -21,7 +21,7 @@
         <field name="arch" type="xml">
             <form string="My Cart">
                 <sheet>
-                    <!-- NEW: Barcode quick add section -->
+                    <!-- Barcode quick add -->
                     <group string="Quick Add by Barcode" col="2">
                         <field name="barcode_input" placeholder="Scan or type barcode..."/>
                         <button name="action_add_by_barcode" type="object" string="Add" class="btn-primary"/>
@@ -29,6 +29,14 @@
                             <i class="fa fa-barcode"/> Scan any medicine barcode to add it immediately (quantity 1).
                         </div>
                     </group>
+
+                    <!-- Drug interaction warning (if any) -->
+                    <field name="interaction_warnings" invisible="not interaction_warnings">
+                        <div class="alert alert-warning" role="alert" style="margin-top: 8px;">
+                            <i class="fa fa-exclamation-triangle"/> <strong>Drug Interaction Warning:</strong>
+                            <p><field name="interaction_warnings" nolabel="1"/></p>
+                        </div>
+                    </field>
 
                     <separator string="Add Medicines to Cart"/>
 
