@@ -11,8 +11,8 @@
     """,
     'depends': [
         'base_setup',
-        "estate",
-        "account"
+        'estate',
+        'account'
     ],
     'author': 'Muhammad Qasim Shabbir',
     'license': 'LGPL-3',
@@ -24,3 +24,4 @@
     'auto_install': False,
 
 }
+

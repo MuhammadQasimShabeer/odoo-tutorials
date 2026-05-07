@@ -88,3 +88,4 @@ class EstatePropertyOffer(models.Model):
             property_rec.state = "offer_received"
 
         return super().create(vals)
+

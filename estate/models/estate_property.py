@@ -181,4 +181,3 @@ class EstateProperty(models.Model):
 
         return super().create(vals)
 
-    

@@ -2,28 +2,30 @@ from odoo import models, Command
 
 
 class EstateProperty(models.Model):
-        _inherit = "estate.property"
-        def action_sold(self):
-            res = super().action_sold()
+    _inherit = "estate.property"
 
-            for record in self:
-                selling_price = record.selling_price or 0.0
+    def action_sold(self):
+        res = super().action_sold()
 
-                self.env["account.move"].create({
-                    "partner_id": record.buyer_id.id,
-                    "move_type": "out_invoice",
-                    "invoice_line_ids": [
-                        Command.create({
-                            "name": "6% Commission",
-                            "quantity": 1,
-                            "price_unit": selling_price * 0.06,
-                        }),
-                        Command.create({
-                            "name": "Administrative Fees",
-                            "quantity": 1,
-                            "price_unit": 100.0,
-                        }),
-                    ],
-                })
+        for record in self:
+            selling_price = record.selling_price or 0.0
 
-            return res
+            self.env["account.move"].create({
+                "partner_id": record.buyer_id.id,
+                "move_type": "out_invoice",
+                "invoice_line_ids": [
+                    Command.create({
+                        "name": "6% Commission",
+                        "quantity": 1,
+                        "price_unit": selling_price * 0.06,
+                    }),
+                    Command.create({
+                        "name": "Administrative Fees",
+                        "quantity": 1,
+                        "price_unit": 100.0,
+                    }),
+                ],
+            })
+
+        return res
+

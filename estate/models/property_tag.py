@@ -10,3 +10,4 @@ class EstatePropertyTag(models.Model):
 
     # estate.property.tag
     color = fields.Integer()
+

@@ -22,23 +22,25 @@
     'auto_install': False,
 
     # Add these later as you create files
-    "data": [
-        "security/security.xml",
-        "security/ir.model.access.csv",
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
 
         # 1. FIRST: property views (defines actions)
-        "views/estate_property_views.xml",
-        "data/property_type_data.xml",
+        'views/estate_property_views.xml',
+        'data/property_type_data.xml',
 
         # 2. SECOND: type + tag views (define actions used by menu)
-        "views/estate_property_type.xml",
-        "views/estate_property_tag_views.xml",
+        'views/estate_property_type.xml',
+        'views/estate_property_tag_views.xml',
 
         # 3. LAST: menus (depends on actions above)
-        "views/estate_menus.xml",
+        'views/estate_menus.xml',
     ],
-    "demo": [
-        "demo/property_offer_demo.xml",
+    'demo': [
+        'demo/property_offer_demo.xml',
 
     ]
 }
+
+
