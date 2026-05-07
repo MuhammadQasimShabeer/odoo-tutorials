@@ -1,6 +1,6 @@
-from odoo import models, fields, api, _
 from datetime import date, timedelta
-from odoo.exceptions import UserError
+
+from odoo import api, fields, models
 
 
 class PharmaControlCenter(models.Model):
@@ -17,8 +17,6 @@ class PharmaControlCenter(models.Model):
     display_name = fields.Char(string="Full Name", required=True)
     email = fields.Char(string="Email", required=True)
     phone = fields.Char(string="Phone")
-
-
 
     @api.model_create_multi
     def create(self, vals_list):

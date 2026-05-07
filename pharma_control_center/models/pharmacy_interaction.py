@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+from odoo import api, fields, models
+
 
 class PharmacyInteraction(models.Model):
     _name = "pharmacy.interaction"

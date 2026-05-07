@@ -1,5 +1,6 @@
-from odoo import models, fields, api, _
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+
 
 class PharmacyCart(models.Model):
     _name = "pharmacy.cart"
@@ -88,9 +89,9 @@ class PharmacyCart(models.Model):
             raise UserError(_("Please scan or enter a barcode."))
         medicine = self.env['pharmacy.medicine'].search([('barcode', '=', barcode)], limit=1)
         if not medicine:
-            raise UserError(_("No medicine found with barcode %s.") % barcode)
+            raise UserError(_("No medicine found with barcode %s.", barcode))
         if medicine.quantity <= 0:
-            raise UserError(_("Medicine %s is out of stock.") % medicine.name)
+            raise UserError(_("Medicine %s is out of stock.", medicine.name))
         line = self.env['pharmacy.cart.line'].search([
             ('cart_id', '=', self.id),
             ('medicine_id', '=', medicine.id)
@@ -116,7 +117,10 @@ class PharmacyCart(models.Model):
         severe = [i for i in interactions if i['severity'] == 'severe']
         if severe:
             warnings = "\n".join([f"{i['medicine1']} + {i['medicine2']}: {i['warning']}" for i in severe])
-            raise UserError(_("Drug Interaction Warning!\n\n%s\n\nPlease remove conflicting medicines or contact your doctor.") % warnings)
+            raise UserError(_(
+                "Drug Interaction Warning!\n\n%s\n\nPlease remove conflicting medicines or contact your doctor.",
+                warnings,
+            ))
 
         order_lines = []
         for line in self.cart_line_ids:
@@ -144,6 +148,7 @@ class PharmacyCart(models.Model):
             'view_mode': 'form',
             'target': 'new',
         }
+
 
 class PharmacyCartLine(models.Model):
     _name = "pharmacy.cart.line"
