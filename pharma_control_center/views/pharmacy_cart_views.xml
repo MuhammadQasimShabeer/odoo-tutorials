@@ -22,6 +22,7 @@
             <form string="My Cart">
                 <sheet>
                     <!-- Barcode quick add -->
+                    <!-- NEW: Barcode quick add section -->
                     <group string="Quick Add by Barcode" col="2">
                         <field name="barcode_input" placeholder="Scan or type barcode..."/>
                         <button name="action_add_by_barcode" type="object" string="Add" class="btn-primary"/>

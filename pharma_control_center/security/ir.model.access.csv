@@ -28,3 +28,4 @@ access_pharmacy_interaction_patient,pharmacy.interaction.patient,model_pharmacy_
 access_pharmacy_interaction_doctor,pharmacy.interaction.doctor,model_pharmacy_interaction,pharma_control_center.group_pharmacy_doctor,1,0,0,0
 access_pharmacy_interaction_manager,pharmacy.interaction.manager,model_pharmacy_interaction,pharma_control_center.group_pharmacy_manager,1,1,1,1
 access_pharmacy_interaction_admin,pharmacy.interaction.admin,model_pharmacy_interaction,base.group_user,1,1,1,1
+access_sale_order_manager,sale.order.manager,sale.model_sale_order,pharma_control_center.group_pharmacy_manager,1,1,1,1

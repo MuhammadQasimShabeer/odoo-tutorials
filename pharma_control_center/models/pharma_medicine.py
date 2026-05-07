@@ -4,6 +4,10 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
+from odoo import models, fields, api, _
+from datetime import date, timedelta, datetime
+from odoo.exceptions import UserError
+
 class PharmacyMedicine(models.Model):
     _name = "pharmacy.medicine"
     _description = "Pharmacy Medicine"
@@ -57,6 +61,7 @@ class PharmacyMedicine(models.Model):
             raise UserError(_("Order quantity must be greater than zero."))
         if self.order_qty > self.quantity:
             raise UserError(_("Not enough stock. Available: %s", self.quantity))
+            raise UserError(_("Not enough stock. Available: %s") % self.quantity)
 
         cart = self.env['pharmacy.cart'].search([('user_id', '=', self.env.user.id)], limit=1)
         if not cart:
@@ -81,6 +86,7 @@ class PharmacyMedicine(models.Model):
             'params': {
                 'title': _('Added to Cart'),
                 'message': _("Added %s to your cart.", self.name),
+                'message': _("Added %s to your cart.") % self.name,
                 'type': 'success',
                 'sticky': False,
             }
@@ -164,3 +170,4 @@ class PharmacyMedicine(models.Model):
 
 
 
+            med.today_orders_qty = total

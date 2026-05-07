@@ -26,8 +26,9 @@ Central system for pharmacy operations:
         'security/pharmacy_patient_security.xml',
         'security/sale_order_security.xml',
         'security/ir.model.access.csv',
+        'data/demo_patients.xml',
+        'data/demo_medicines.xml',
         'views/pharma_control_center_views.xml',   # root menu defined here
-        'views/pharmacy_interaction_views.xml',
         'views/pharmacy_medicine_views.xml',
         'views/pharmacy_patient_views.xml',        # now includes the menuitem
         'views/pharmacy_category_views.xml',
@@ -35,10 +36,6 @@ Central system for pharmacy operations:
         'views/pharmacy_cart_views.xml',
         'views/sales_report_views.xml',
         'views/manager_analytics_views.xml',
-    ],
-    'demo': [
-        'data/demo_patients.xml',
-        'data/demo_medicines.xml',
     ],
     'installable': True,
     'application': True,
