@@ -2,8 +2,6 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
 
 class PharmacyCart(models.Model):
     _name = "pharmacy.cart"
@@ -95,9 +93,6 @@ class PharmacyCart(models.Model):
             raise UserError(_("No medicine found with barcode %s.", barcode))
         if medicine.quantity <= 0:
             raise UserError(_("Medicine %s is out of stock.", medicine.name))
-            raise UserError(_("No medicine found with barcode %s.") % barcode)
-        if medicine.quantity <= 0:
-            raise UserError(_("Medicine %s is out of stock.") % medicine.name)
         line = self.env['pharmacy.cart.line'].search([
             ('cart_id', '=', self.id),
             ('medicine_id', '=', medicine.id)
@@ -111,7 +106,6 @@ class PharmacyCart(models.Model):
                 'quantity': 1,
             })
         self.barcode_input = False
-        self.barcode_input = False  # clear after use
         return {'type': 'ir.actions.client', 'tag': 'reload'}
 
     def action_checkout(self):
@@ -172,4 +166,3 @@ class PharmacyCartLine(models.Model):
         for line in self:
             line.subtotal = line.quantity * line.unit_price
 
-            line.subtotal = line.quantity * line.unit_price

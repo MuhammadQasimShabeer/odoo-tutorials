@@ -1,6 +1,5 @@
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 from datetime import date, timedelta
-from odoo.exceptions import UserError
 
 
 class PharmaControlCenter(models.Model):
