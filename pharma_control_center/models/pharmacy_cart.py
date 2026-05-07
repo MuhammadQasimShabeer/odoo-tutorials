@@ -112,11 +112,10 @@ class PharmacyCart(models.Model):
         if not self.cart_line_ids:
             raise UserError(_("Your cart is empty."))
 
-        # Check for severe interactions and block checkout
+        # Check for ANY interaction and block checkout
         interactions = self._check_interactions()
-        severe = [i for i in interactions if i['severity'] == 'severe']
-        if severe:
-            warnings = "\n".join([f"{i['medicine1']} + {i['medicine2']}: {i['warning']}" for i in severe])
+        if interactions:
+            warnings = "\n".join([f"{i['medicine1']} + {i['medicine2']}: {i['warning']}" for i in interactions])
             raise UserError(_(
                 "Drug Interaction Warning!\n\n%s\n\nPlease remove conflicting medicines or contact your doctor.",
                 warnings,
