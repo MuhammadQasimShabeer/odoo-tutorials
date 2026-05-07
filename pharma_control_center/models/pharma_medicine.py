@@ -160,3 +160,7 @@ class PharmacyMedicine(models.Model):
                 ])
                 total = sum(lines.mapped('product_uom_qty'))
             med.today_orders_qty = total
+
+
+
+

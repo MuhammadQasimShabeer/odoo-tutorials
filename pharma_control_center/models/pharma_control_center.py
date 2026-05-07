@@ -158,3 +158,5 @@ class PharmaControlCenter(models.Model):
             record = self.create(
                 {'user_id': user.id, 'display_name': user.name, 'email': user.email, 'phone': user.phone})
         return record.id
+
+
