@@ -164,3 +164,4 @@ class PharmacyCartLine(models.Model):
     def _compute_subtotal(self):
         for line in self:
             line.subtotal = line.quantity * line.unit_price
+
