@@ -18,7 +18,7 @@ class PharmacyCart(models.Model):
     # Barcode input (temporary, not stored)
     barcode_input = fields.Char(string="Barcode", help="Scan or type medicine barcode to add to cart")
 
-    # Drug interaction warnings
+    # Drug interaction warnings (displayed in the form)
     interaction_warnings = fields.Text(string="Interactions", compute="_compute_interaction_warnings")
 
     @api.depends('cart_line_ids.subtotal')
@@ -30,22 +30,35 @@ class PharmacyCart(models.Model):
     @api.depends('cart_line_ids.medicine_id')
     def _compute_interaction_warnings(self):
         for cart in self:
-            warnings = cart._check_interactions()
-            cart.interaction_warnings = "\n".join(warnings) if warnings else False
+            medicines = cart.cart_line_ids.mapped('medicine_id')
+            if len(medicines) < 2:
+                cart.interaction_warnings = False
+                continue
+            interactions = self.env['pharmacy.interaction'].search([
+                ('medicine1_id', 'in', medicines.ids),
+                ('medicine2_id', 'in', medicines.ids)
+            ])
+            if interactions:
+                warnings = [f"{i.medicine1_id.name} + {i.medicine2_id.name}: {i.warning_text}" for i in interactions]
+                cart.interaction_warnings = "\n".join(warnings)
+            else:
+                cart.interaction_warnings = False
 
     def _check_interactions(self):
-        """Return a list of interaction warnings for current cart lines."""
+        """Return list of interaction dicts for current cart lines."""
         medicines = self.cart_line_ids.mapped('medicine_id')
         if len(medicines) < 2:
             return []
-        warnings = []
         interactions = self.env['pharmacy.interaction'].search([
             ('medicine1_id', 'in', medicines.ids),
             ('medicine2_id', 'in', medicines.ids)
         ])
-        for inter in interactions:
-            warnings.append(f"{inter.medicine1_id.name} + {inter.medicine2_id.name}: {inter.warning_text} (Severity: {inter.severity})")
-        return warnings
+        return [{
+            'medicine1': inter.medicine1_id.name,
+            'medicine2': inter.medicine2_id.name,
+            'severity': inter.severity,
+            'warning': inter.warning_text,
+        } for inter in interactions]
 
     def action_add_quick_medicines(self):
         for cart in self:
@@ -97,20 +110,14 @@ class PharmacyCart(models.Model):
         self.ensure_one()
         if not self.cart_line_ids:
             raise UserError(_("Your cart is empty."))
-        # Optionally check for severe interactions and block checkout
-        severe_warnings = [w for w in self._check_interactions() if 'Severe' in w]
-        if severe_warnings and not self.env.context.get('ignore_interactions'):
-            warnings_text = "\n".join(severe_warnings)
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Drug Interaction Warning'),
-                    'message': warnings_text + "\n\nPlease remove conflicting medicines or contact your doctor.",
-                    'type': 'warning',
-                    'sticky': True,
-                }
-            }
+
+        # Check for severe interactions and block checkout
+        interactions = self._check_interactions()
+        severe = [i for i in interactions if i['severity'] == 'severe']
+        if severe:
+            warnings = "\n".join([f"{i['medicine1']} + {i['medicine2']}: {i['warning']}" for i in severe])
+            raise UserError(_("Drug Interaction Warning!\n\n%s\n\nPlease remove conflicting medicines or contact your doctor.") % warnings)
+
         order_lines = []
         for line in self.cart_line_ids:
             if not line.medicine_id.product_id:
