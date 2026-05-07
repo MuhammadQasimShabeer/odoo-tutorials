@@ -1,3 +1,7 @@
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
+
+
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -18,11 +22,47 @@ class PharmacyCart(models.Model):
     # Barcode input (temporary, not stored)
     barcode_input = fields.Char(string="Barcode", help="Scan or type medicine barcode to add to cart")
 
+    # Drug interaction warnings (displayed in the form)
+    interaction_warnings = fields.Text(string="Interactions", compute="_compute_interaction_warnings")
+
     @api.depends('cart_line_ids.subtotal')
     def _compute_totals(self):
         for cart in self:
             cart.total_quantity = sum(cart.cart_line_ids.mapped('quantity'))
             cart.total_amount = sum(cart.cart_line_ids.mapped('subtotal'))
+
+    @api.depends('cart_line_ids.medicine_id')
+    def _compute_interaction_warnings(self):
+        for cart in self:
+            medicines = cart.cart_line_ids.mapped('medicine_id')
+            if len(medicines) < 2:
+                cart.interaction_warnings = False
+                continue
+            interactions = self.env['pharmacy.interaction'].search([
+                ('medicine1_id', 'in', medicines.ids),
+                ('medicine2_id', 'in', medicines.ids)
+            ])
+            if interactions:
+                warnings = [f"{i.medicine1_id.name} + {i.medicine2_id.name}: {i.warning_text}" for i in interactions]
+                cart.interaction_warnings = "\n".join(warnings)
+            else:
+                cart.interaction_warnings = False
+
+    def _check_interactions(self):
+        """Return list of interaction dicts for current cart lines."""
+        medicines = self.cart_line_ids.mapped('medicine_id')
+        if len(medicines) < 2:
+            return []
+        interactions = self.env['pharmacy.interaction'].search([
+            ('medicine1_id', 'in', medicines.ids),
+            ('medicine2_id', 'in', medicines.ids)
+        ])
+        return [{
+            'medicine1': inter.medicine1_id.name,
+            'medicine2': inter.medicine2_id.name,
+            'severity': inter.severity,
+            'warning': inter.warning_text,
+        } for inter in interactions]
 
     def action_add_quick_medicines(self):
         for cart in self:
@@ -52,6 +92,9 @@ class PharmacyCart(models.Model):
             raise UserError(_("Please scan or enter a barcode."))
         medicine = self.env['pharmacy.medicine'].search([('barcode', '=', barcode)], limit=1)
         if not medicine:
+            raise UserError(_("No medicine found with barcode %s.", barcode))
+        if medicine.quantity <= 0:
+            raise UserError(_("Medicine %s is out of stock.", medicine.name))
             raise UserError(_("No medicine found with barcode %s.") % barcode)
         if medicine.quantity <= 0:
             raise UserError(_("Medicine %s is out of stock.") % medicine.name)
@@ -67,6 +110,7 @@ class PharmacyCart(models.Model):
                 'medicine_id': medicine.id,
                 'quantity': 1,
             })
+        self.barcode_input = False
         self.barcode_input = False  # clear after use
         return {'type': 'ir.actions.client', 'tag': 'reload'}
 
@@ -74,6 +118,16 @@ class PharmacyCart(models.Model):
         self.ensure_one()
         if not self.cart_line_ids:
             raise UserError(_("Your cart is empty."))
+
+        # Check for ANY interaction and block checkout
+        interactions = self._check_interactions()
+        if interactions:
+            warnings = "\n".join([f"{i['medicine1']} + {i['medicine2']}: {i['warning']}" for i in interactions])
+            raise UserError(_(
+                "Drug Interaction Warning!\n\n%s\n\nPlease remove conflicting medicines or contact your doctor.",
+                warnings,
+            ))
+
         order_lines = []
         for line in self.cart_line_ids:
             if not line.medicine_id.product_id:
@@ -101,6 +155,7 @@ class PharmacyCart(models.Model):
             'target': 'new',
         }
 
+
 class PharmacyCartLine(models.Model):
     _name = "pharmacy.cart.line"
     _description = "Cart Line"
@@ -115,4 +170,6 @@ class PharmacyCartLine(models.Model):
     @api.depends('quantity', 'unit_price')
     def _compute_subtotal(self):
         for line in self:
+            line.subtotal = line.quantity * line.unit_price
+
             line.subtotal = line.quantity * line.unit_price

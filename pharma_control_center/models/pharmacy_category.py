@@ -1,3 +1,5 @@
+from odoo import fields, models
+
 from odoo import models, fields
 
 class PharmacyCategory(models.Model):
@@ -9,4 +11,5 @@ class PharmacyCategory(models.Model):
     code = fields.Char(string="Category Code", help="Short code, e.g., ANTIBIOTIC")
     description = fields.Text(string="Description")
     parent_id = fields.Many2one('pharmacy.category', string="Parent Category", ondelete='restrict')
+    child_ids = fields.One2many('pharmacy.category', 'parent_id', string="Child Categories")
     child_ids = fields.One2many('pharmacy.category', 'parent_id', string="Child Categories")
