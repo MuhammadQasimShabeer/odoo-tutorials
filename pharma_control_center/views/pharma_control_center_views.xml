@@ -64,9 +64,10 @@
                         <page string="⚠️ Expiry Alerts" name="expiry">
                             <group string="Expiring Medicines (Next 30 days)">
                                 <field name="expiring_soon_count" widget="statinfo" string="Count"/>
-                                <button name="%(pharmacy_medicine_action)d" type="action"
-                                        string="View Expiring Medicines" class="btn-secondary"
-                                        context="{'search_default_expiring_soon': 1}"/>
+                                <!-- Removed the problematic button -->
+                                <div class="alert alert-warning">
+                                    <i class="fa fa-clock-o"></i> <strong>Note:</strong> Check the Medicines menu to view expiring products.
+                                </div>
                             </group>
                         </page>
                     </notebook>

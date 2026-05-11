@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Simple static form view for Privacy Policy -->
+    <record id="privacy_policy_form_view" model="ir.ui.view">
+        <field name="name">privacy.policy.form</field>
+        <field name="model">pharma.control.center</field>
+        <field name="arch" type="xml">
+            <form string="Privacy Policy">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>🔒 Privacy Policy</h1>
+                    </div>
+                    <div class="oe_form_field">
+                        <p><strong>Last Updated:</strong> May 11, 2026</p>
+
+                        <h3>1. Information We Collect</h3>
+                        <p>We collect personal information such as name, email address, phone number, medical history, and prescription details when you use our Pharma Control Center application.</p>
+
+                        <h3>2. How We Use Your Information</h3>
+                        <p>We use your information to:</p>
+                        <ul>
+                            <li>Process orders and prescriptions</li>
+                            <li>Manage patient records and doctor assignments</li>
+                            <li>Send order confirmations and notifications</li>
+                            <li>Improve our services</li>
+                        </ul>
+
+                        <h3>3. Data Sharing</h3>
+                        <p>We do not sell or share your personal information with third parties except as required by law or to fulfill your orders.</p>
+
+                        <h3>4. Data Security</h3>
+                        <p>We implement industry-standard security measures to protect your data from unauthorized access, alteration, or disclosure.</p>
+
+                        <h3>5. Your Rights</h3>
+                        <p>You have the right to access, correct, or delete your personal information. Contact your pharmacy administrator for assistance.</p>
+
+                        <h3>6. Contact Us</h3>
+                        <p>If you have questions about this privacy policy, please contact us at:</p>
+                        <p><strong>Email:</strong> privacy@yourpharmacy.com</p>
+                        <p><strong>Phone:</strong> +1 555-555-5555</p>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open the privacy policy form - using a unique ID -->
+    <record id="action_privacy_policy_form" model="ir.actions.act_window">
+        <field name="name">Privacy Policy</field>
+        <field name="res_model">pharma.control.center</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="privacy_policy_form_view"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu item -->
+    <menuitem id="menu_privacy_policy"
+              name="🔒 Privacy Policy"
+              parent="pharma_root_menu"
+              action="action_privacy_policy_form"
+              sequence="100"
+              groups="base.group_user"/>
+</odoo>
