@@ -1,56 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Load jsQR library for barcode detection -->
-    <template id="barcode_scanner_assets" name="Barcode Scanner Assets" inherit_id="web.assets_backend">
-        <xpath expr="." position="inside">
-            <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"/>
-            <script type="text/javascript">
-                function startCameraScanner(inputFieldId) {
-                    const video = document.createElement('video');
-                    video.id = 'barcode-video-element';
-                    video.width = 300;
-                    video.height = 200;
-                    video.autoplay = true;
-                    video.style.border = '1px solid #ccc';
-                    video.style.marginTop = '10px';
-
-                    const inputField = document.getElementById(inputFieldId);
-                    const parentDiv = inputField.parentElement;
-
-                    if (document.getElementById('barcode-video-element')) return;
-                    parentDiv.appendChild(video);
-
-                    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                        .then(function(stream) {
-                            video.srcObject = stream;
-                            const canvas = document.createElement('canvas');
-                            const context = canvas.getContext('2d');
-                            const scanInterval = setInterval(function() {
-                                if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                                    canvas.width = video.videoWidth;
-                                    canvas.height = video.videoHeight;
-                                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                                    const code = jsQR(imageData.data, canvas.width, canvas.height);
-                                    if (code && code.data) {
-                                        inputField.value = code.data;
-                                        inputField.dispatchEvent(new Event('change'));
-                                        stream.getTracks().forEach(track => track.stop());
-                                        clearInterval(scanInterval);
-                                        video.remove();
-                                    }
-                                }
-                            }, 300);
-                        })
-                        .catch(function(err) {
-                            console.error("Camera error: ", err);
-                            alert("Could not access camera. Please enter barcode manually.");
-                            video.remove();
-                        });
-                }
-            </script>
-        </xpath>
-    </template>
 
     <record id="pharmacy_cart_line_list_view" model="ir.ui.view">
         <field name="name">pharmacy.cart.line.list</field>
@@ -72,15 +21,12 @@
         <field name="arch" type="xml">
             <form string="My Cart">
                 <sheet>
-                    <!-- Barcode quick add with camera button -->
+                    <!-- Barcode quick add (manual input only) -->
                     <group string="Quick Add by Barcode" col="2">
-                        <field name="barcode_input" placeholder="Scan or type barcode..." id="barcode_scanner_field"/>
-                        <div>
-                            <button name="action_add_by_barcode" type="object" string="Add" class="btn-primary"/>
-                            <button type="button" string="📷 Scan" class="btn-secondary" onclick="startCameraScanner('barcode_scanner_field')"/>
-                        </div>
+                        <field name="barcode_input" placeholder="Scan or type barcode..."/>
+                        <button name="action_add_by_barcode" type="object" string="Add" class="btn-primary"/>
                         <div class="alert alert-info" style="margin-top: 8px; margin-bottom: 0;">
-                            <i class="fa fa-camera"/> Click "Scan" to use your device camera, or type the barcode manually.
+                            <i class="fa fa-barcode"/> Type or paste the medicine barcode, then click Add.
                         </div>
                     </group>
 
