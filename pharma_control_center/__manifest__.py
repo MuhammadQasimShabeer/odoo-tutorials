@@ -36,7 +36,11 @@ Central system for pharmacy operations:
         'views/pharmacy_cart_views.xml',
         'views/sales_report_views.xml',
         'views/manager_analytics_views.xml',
-        'views/privacy_policy_views.xml',
+        'views/ai_views.xml',
+        'views/privacy_terms_views.xml',
+    ],
+    'test': [
+        'test/test_pharma_control_center.py',
     ],
     'installable': True,
     'application': True,

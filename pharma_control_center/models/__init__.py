@@ -4,3 +4,7 @@ from . import pharmacy_patient
 from . import pharma_control_center
 from . import pharmacy_cart
 from . import pharmacy_interaction
+from . import pharmacy_ai_service
+from . import pharmacy_chatbot
+from . import privacy_terms
+from . import sentiment_analysis_wizard
