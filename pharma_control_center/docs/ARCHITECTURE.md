@@ -23,6 +23,10 @@ odoo-tutorials/pharma_control_center/
 │   ├── pharmacy_interaction.py
 │   ├── pharmacy_patient.py
 │   ├── pharma_medicine.py
+│   ├── pharmacy_ai_service.py
+│   ├── pharmacy_chatbot.py
+│   ├── privacy_terms.py
+│   ├── sentiment_analysis_wizard.py
 │   └── __pycache__/
 │
 ├── security/
@@ -36,7 +40,6 @@ odoo-tutorials/pharma_control_center/
 │   └── (test files not shown)
 │
 ├── views/
-│   ├── manager_analytics_views.xml
 │   ├── pharma_control_center_views.xml
 │   ├── pharmacy_cart_views.xml
 │   ├── pharmacy_category_views.xml
@@ -44,7 +47,10 @@ odoo-tutorials/pharma_control_center/
 │   ├── pharmacy_medicine_views.xml
 │   ├── pharmacy_order_views.xml
 │   ├── pharmacy_patient_views.xml
-│   └── sales_report_views.xml
+│   ├── sales_report_views.xml
+│   ├── manager_analytics_views.xml
+│   ├── ai_views.xml
+│   └── privacy_terms_views.xml
 │
 ├── __init__.py
 ├── __manifest__.py
@@ -61,7 +67,7 @@ odoo-tutorials/pharma_control_center/
 
 ### Views / Menus
 
-All menus live under the root menu **“💊 Your Pharma CC”**:
+All menus live under the root menu **"💊 Your Pharma CC"**:
 
 - **👤 User Dashboard**: `pharma.control.center` (form)
 - **💊 Medicines**: `pharmacy.medicine` (kanban/list/form)
@@ -71,6 +77,10 @@ All menus live under the root menu **“💊 Your Pharma CC”**:
 - **⚙️ Configuration → 📂 Categories**: `pharmacy.category` (manager only)
 - **⚠️ Drug Interactions**: `pharmacy.interaction` (manager only)
 - **📊 Analytics**: `sale.order` graph/pivot reporting (manager only)
+- **🤖 AI Sentiment Analysis**: `sentiment.analysis.wizard` (manager only)
+- **🤖 AI Assistant**: `pharmacy.chatbot` (all users)
+- **🔒 Privacy Policy**: `privacy.terms` (all users)
+- **📜 Terms of Service**: `privacy.terms` (all users)
 
 ## Key Business Flows
 

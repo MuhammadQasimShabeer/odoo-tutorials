@@ -37,6 +37,9 @@ This module is implemented as standard Odoo models + backend views (no website/p
 
 Declared in [`__manifest__.py`](__manifest__.py): `base_setup`, `product`, `sale`, `account`.
 
+**Additional Requirements:**
+- External: Hugging Face API token (free tier available at [huggingface.co](https://huggingface.co/settings/tokens)) for AI chatbot and sentiment analysis features
+
 ## Installation
 
 1. Put `pharma_control_center/` in one of your Odoo `addons_path` directories.
@@ -49,6 +52,29 @@ Assign users to one of these groups:
 - **Pharma Control Center / Patient**
 - **Pharma Control Center / Doctor**
 - **Pharma Control Center / Manager**
+
+## Configuration (AI Features - Optional)
+
+To enable the AI chatbot and sentiment analysis features:
+
+1. **Obtain a Hugging Face API Token:**
+   - Visit [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+   - Create a new API token (free tier available)
+   - Copy the token
+
+2. **Configure in Odoo:**
+   - Navigate to **Settings → Technical → Parameters → System Parameters**
+   - Create a new system parameter:
+     - **Key:** `HF_API_TOKEN`
+     - **Value:** (paste your token)
+   - Click **Save**
+
+3. **Verify:**
+   - Users can now access **🤖 AI Assistant** menu
+   - Managers can access **🤖 AI Sentiment Analysis** menu
+   - If token is invalid, users will see a helpful error message
+
+**Note:** Both features are optional. The module works without AI features if you skip this configuration.
 
 ## Demo Data
 
@@ -63,13 +89,14 @@ When demo data is enabled, the module loads:
 
 ## Documentation
 
-- [ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- [TECHNICAL_DETAILS.md](docs/TECHNICAL_DETAILS.md)
-- [SECURITY.md](docs/SECURITY.md)
-- [USER_GUIDE.md](docs/USER_GUIDE.md)
-- [DEMO_DATA.md](docs/DEMO_DATA.md)
-- [CHANGELOG.md](docs/CHANGELOG.md)
-- [TESTING.md](TESTING.md)
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) – Module structure and data flow
+- [TECHNICAL_DETAILS.md](docs/TECHNICAL_DETAILS.md) – Code-level model documentation
+- [SECURITY.md](docs/SECURITY.md) – Access control and API configuration
+- [USER_GUIDE.md](docs/USER_GUIDE.md) – Functional user workflows
+- [AI_FEATURES.md](docs/AI_FEATURES.md) – Comprehensive AI chatbot & sentiment analysis guide
+- [DEMO_DATA.md](docs/DEMO_DATA.md) – Demo data specifications
+- [CHANGELOG.md](docs/CHANGELOG.md) – Version history and updates
+- [TESTING.md](TESTING.md) – Testing procedures
 
 ## License
 
@@ -85,7 +112,9 @@ LGPL-3 (see `license` in the manifest).
 - 👥 **Patient-doctor relationship system** with secure record visibility
 - 🛒 **Cart-based ordering workflow** with one-click checkout and automatic invoicing
 - 📊 **Real-time dashboard** with user profile, statistics, and operational alerts
+- 🤖 **AI-Powered Features** – Intelligent chatbot and customer sentiment analysis
 - 🔐 **Enterprise-grade security** with role-based access control and record-level rules
+- 🔒 **Privacy Compliance** – Built-in privacy policy and terms of service
 - ✨ **Odoo 18 compliant** with modern views, computed fields, and QWeb templates
 
 ---
@@ -169,6 +198,21 @@ LGPL-3 (see `license` in the manifest).
 - **Invoice tracking** – direct access to generated invoices from each order
 - **Order state tracking** – full lifecycle from draft to paid/delivered
 
+### 🤖 AI-Powered Pharmacy Assistant
+
+#### Intelligent Chatbot
+- **Live AI responses** – powered by Hugging Face Llama 3.1-8B model via API
+- **Context-aware assistance** – provides real-time medicine stock info and order summaries
+- **Multi-turn conversations** – maintains chat history for continuity
+- **Accessible to all users** – available from the main menu
+- **Smart data injection** – automatically enriches responses with live pharmacy data
+
+#### Customer Sentiment Analysis  
+- **AI sentiment classification** – analyzes customer feedback into Positive/Neutral/Negative
+- **Manager access only** – for quality monitoring and service improvement
+- **One-click analysis** – wizard interface for quick feedback evaluation
+- **Powered by LLM** – same Hugging Face backend as chatbot
+
 ### 📊 Real-Time Operational Dashboard
 
 #### User Profile Management
@@ -243,7 +287,17 @@ LGPL-3 (see `license` in the manifest).
 - **Cannot access** – medicines list, patient records, categories, configuration
 - **Menu access** – Medicines (White only), Orders (own orders)
 
-#### Security Implementation: Record Rules (ir.rule)
+### 🔒 Privacy & Compliance
+
+#### Privacy Policy & Terms of Service
+- **Built-in access** – accessible via menu for all users
+- **Comprehensive policies** – covers data collection, usage, security, and user rights
+- **Medical disclaimer** – clearly states Pharma Control Center does not provide medical advice
+- **Last updated** – maintains transparency with update dates
+- **Legal compliance** – supports GDPR and data protection requirements
+
+#### Security Features
+
 
 **Medicine Visibility Rules**
 ```
@@ -693,7 +747,14 @@ odoo -d your_database -i pharma_control_center --test-tags pharma_control_center
 
 ## 📋 Changelog
 
-### Version 1.0 (Current) – April 29, 2026
+### Version 1.1 (May 18, 2026)
+- ✅ **AI Pharmacy Assistant Chatbot** – Context-aware AI helper using Hugging Face Llama 3.1-8B
+- ✅ **Customer Sentiment Analysis** – AI-powered feedback classification (Positive/Neutral/Negative)
+- ✅ **Privacy Policy & Terms of Service** – Built-in legal compliance documentation
+- ✅ **System parameter configuration** – HF_API_TOKEN for secure API access
+- ✅ **Comprehensive documentation** – Updated all .md files with new features
+
+### Version 1.0 (April 29, 2026)
 - ✅ Complete medicine management module with batch and expiry tracking
 - ✅ Patient records with doctor assignments and role-based visibility
 - ✅ Cart-based ordering workflow with one-click checkout
@@ -744,9 +805,9 @@ This module is free software: you can redistribute it and/or modify it under the
 **Pharma Control Center** is developed with ❤️ for the Odoo community, providing a professional-grade solution for pharmacy and healthcare operations management.
 
 **Author:** Muhammad Qasim Shabbir (AI Trainer/Developer)  
-**Date:** May 1, 2026  
-**Version:** 1.0  
-**Module Status:** Production-Ready  
+**Date:** May 18, 2026  
+**Version:** 1.1  
+**Module Status:** Production-Ready with AI Features  
 **Odoo Compatibility:** 18.0+
 
 ---

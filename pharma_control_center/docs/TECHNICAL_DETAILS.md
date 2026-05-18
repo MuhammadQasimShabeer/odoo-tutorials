@@ -68,6 +68,68 @@ Notable constraints:
 
 Purpose: defines an interaction between two medicines with `severity` and `warning_text`.
 
+## AI & Chatbot Integration
+
+### `pharmacy.ai.service` (`models/pharmacy_ai_service.py`) – AbstractModel
+
+Purpose: provides AI/LLM integration using Hugging Face API and Llama 3.1-8B model.
+
+**Configuration:**
+- Requires system parameter `HF_API_TOKEN` (Hugging Face API token)
+- Uses `https://router.huggingface.co/v1/chat/completions` endpoint
+- Model: `meta-llama/Llama-3.1-8B-Instruct:novita` (configurable in `_call_llm`)
+- Temperature: 0.7, Max tokens: 500
+
+Key methods:
+- `_call_llm(messages, model)`: sends message list to Hugging Face API, returns response text
+- `analyze_sentiment(text)`: returns sentiment classification (Positive/Neutral/Negative)
+- `chat(user_message, conversation_history)`: context-aware chatbot response with live data injection
+- `_get_medicine_stock_info(user_message)`: extracts medicine name and returns stock info
+- `_get_today_orders_info(user_message)`: fetches today's order statistics when relevant
+
+### `pharmacy.chatbot` (`models/pharmacy_chatbot.py`) – TransientModel
+
+Purpose: provides access point for AI pharmacy assistant with conversational interface.
+
+Notable fields:
+- `chat_history`: accumulated conversation history (text, readonly)
+- `user_message`: user input field (not required)
+
+Key methods:
+- `action_send_message()`: sends user message to AI service, appends response to chat history, returns updated form
+
+Features:
+- Maintains persistent chat history in same session
+- Displays emoji indicators (🧑‍⚕️ for user, 🤖 for AI)
+- Provides context-aware responses using live pharmacy data
+- Accessible via modal dialog
+
+### `sentiment.analysis.wizard` (`models/sentiment_analysis_wizard.py`) – TransientModel
+
+Purpose: one-shot sentiment analysis tool for customer feedback (manager access).
+
+Notable fields:
+- `feedback_text`: required input field for customer feedback
+- `sentiment_result`: readonly field for analyzed sentiment
+
+Key methods:
+- `action_analyze()`: calls `pharmacy.ai.service.analyze_sentiment()`, returns updated form
+
+Features:
+- AI analyzes feedback and returns: Positive, Neutral, or Negative
+- Manager-only access for quality monitoring
+- Simple wizard interface for quick analysis
+
+### `privacy.terms` (`models/privacy_terms.py`) – TransientModel
+
+Purpose: placeholder model for privacy policy and terms of service views (no data fields).
+
+Features:
+- Lightweight transient model
+- Views display comprehensive policies
+- Accessible to all authenticated users
+- Two separate forms: Privacy Policy and Terms of Service
+
 ## Checkout Implementation Notes
 
 - The module uses a *custom* stock quantity field (`pharmacy.medicine.quantity`).

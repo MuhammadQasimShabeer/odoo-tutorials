@@ -78,3 +78,60 @@ Menu: **💊 Your Pharma CC → 📊 Analytics**
 
 Provides graph/pivot reporting over Sales Orders.
 
+## 🤖 AI Assistant (All Users)
+
+Menu: **💊 Your Pharma CC → 🤖 AI Assistant**
+
+Access the intelligent pharmacy assistant chatbot:
+- Type your questions about medicines, dosage, side effects, or pharmacy operations
+- The AI provides context-aware responses using live pharmacy data
+- Chat history is maintained during your session
+- Examples of questions:
+  - "How many units of Aspirin do we have in stock?"
+  - "What are today's orders?"
+  - "Tell me about Amoxicillin"
+  - "What are the side effects of Paracetamol?"
+
+**Note:** Requires valid HF_API_TOKEN configuration by system administrator.
+
+## 🤖 Sentiment Analysis (Manager)
+
+Menu: **💊 Your Pharma CC → 🤖 AI Sentiment Analysis**
+
+Analyze customer feedback to understand satisfaction levels:
+1. Enter customer feedback text in the feedback field
+2. Click **Analyze Sentiment**
+3. The system classifies feedback as: **Positive**, **Neutral**, or **Negative**
+
+Use this tool for:
+- Quality monitoring
+- Customer satisfaction tracking
+- Service improvement planning
+- Feedback categorization
+
+**Note:** Manager access only. Requires valid HF_API_TOKEN configuration.
+
+## 🔒 Privacy Policy (All Users)
+
+Menu: **💊 Your Pharma CC → 🔒 Privacy Policy**
+
+View the comprehensive privacy policy covering:
+- Information collection practices
+- Data usage and sharing policies
+- Data security measures
+- Your data rights and how to exercise them
+- Contact information for privacy inquiries
+
+## 📜 Terms of Service (All Users)
+
+Menu: **💊 Your Pharma CC → 📜 Terms of Service**
+
+Review the terms governing use of Pharma Control Center:
+- Acceptance of terms when using the system
+- Account responsibility and confidentiality
+- Medical disclaimer (the system does not provide medical advice)
+- Order processing policies
+- Limitation of liability
+- Governing law and jurisdiction
+- Policy amendment procedures
+
